@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Surgical Sample Wizard</title>
+
+  <!-- Google Fonts & Material Icons -->
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <!-- Materialize CSS -->
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css"
+  >
+
+  <style>
+    body {
+      background: #fafafa;
+      font-family: 'Roboto', sans-serif;
+    }
+
+    header {
+      background: linear-gradient(to right, #007aff, #00bfa5);
+      color: #fff;
+      padding: 1rem;
+      text-align: center;
+      position: relative;
+    }
+
+    header h1 {
+      font-size: 1.6rem;
+      margin: 0.5rem 0;
+      font-weight: 500;
+    }
+
+    header .company-logo {
+      font-size: 0.9rem;
+      margin: 0;
+      opacity: 0.8;
+    }
+
+    #progress-text {
+      font-size: 0.9rem;
+      color: #eee;
+      margin-top: 0.5rem;
+    }
+
+    .progress-container {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      background: #fff;
+      padding: 0.5rem;
+      margin-bottom: 1rem;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+    .page {
+      display: none;
+      flex-direction: column;
+      justify-content: flex-start;
+      padding: 1.5rem 1rem;
+      opacity: 0;
+      transition: opacity 0.5s ease;
+    }
+
+    .page.active {
+      display: flex;
+      opacity: 1;
+    }
+
+    .page h2 {
+      font-size: 1.3rem;
+      margin-bottom: 1rem;
+      font-weight: 500;
+      text-align: center;
+    }
+
+    .page p.instructions {
+      text-align: center;
+      font-size: 1rem;
+      margin-bottom: 2rem;
+      color: #555;
+    }
+
+    .selection-area {
+      max-width: 500px;
+      margin: 0 auto 2rem auto;
+    }
+
+    .navigation-buttons {
+      display: flex;
+      justify-content: space-between;
+      margin-top: auto;
+      margin-bottom: 2rem;
+    }
+
+    .btn-large {
+      width: 48%;
+      font-size: 1rem;
+      padding: 0.75rem 0;
+      text-transform: none;
+    }
+
+    .radio-group, .checkbox-group {
+      margin-bottom: 1.5rem;
+    }
+
+    .radio-group label, .checkbox-group label {
+      font-size: 1.1rem;
+      display: block;
+      padding: 0.5rem 0;
+    }
+
+    table.striped th, table.striped td {
+      padding: 8px;
+    }
+
+    footer {
+      text-align: center;
+      padding: 1rem;
+      color: #999;
+      font-size: 0.8rem;
+      background: #fff;
+      border-top: 1px solid #eee;
+    }
+
+    @media (max-width: 600px) {
+      .btn-large {
+        font-size: 0.9rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <p class="company-logo">[NCH Freiburg]</p>
+    <h1>NCH Surgical Sample Collection</h1>
+    <div id="progress-text">Step <span id="current-step">1</span> of 10</div>
+  </header>
+
+  <div class="progress-container">
+    <div class="progress">
+      <div class="determinate" id="progress-bar" style="width:10%"></div>
+    </div>
+  </div>
+
+  <main>
+    <!-- PAGE 1: MAIN CATEGORY -->
+    <section id="page1" class="page active">
+      <h2>Select Main Category</h2>
+      <p class="instructions">Begin by selecting the main sample category. This will determine subsequent steps.</p>
+      <div class="selection-area input-field">
+        <select id="mainCategory">
+          <option value="" disabled selected>Choose your option</option>
+          <option value="Brain">Brain</option>
+          <option value="Spine">Spine</option>
+        </select>
+        <label>Main Category</label>
+      </div>
+      <div class="navigation-buttons">
+        <button class="btn-large grey lighten-2 black-text" disabled>Previous</button>
+        <button class="btn-large blue white-text next-btn" data-next="page2" disabled>Next</button>
+      </div>
+    </section>
+
+    <!-- PAGE 2: SUB-CATEGORY -->
+    <section id="page2" class="page">
+      <h2>Sub-Category</h2>
+      <p class="instructions">Choose a more specific category within your selected main category.</p>
+      <div class="selection-area input-field">
+        <select id="subCategory">
+          <option value="" disabled selected>Choose your option</option>
+        </select>
+        <label>Sub-Category</label>
+      </div>
+      <div class="navigation-buttons">
+        <button class="btn-large grey lighten-2 black-text prev-btn" data-previous="page1">Previous</button>
+        <button class="btn-large blue white-text next-btn" data-next="page3" disabled>Next</button>
+      </div>
+    </section>
+
+    <!-- PAGE 3: DETAIL SELECTION -->
+    <section id="page3" class="page">
+      <h2>Further Detail</h2>
+      <p class="instructions">Refine your selection further. Depending on the complexity of the case, multiple layers of detail may be required.</p>
+      <div class="selection-area input-field">
+        <select id="detailSelection">
+          <option value="" disabled selected>Choose your option</option>
+        </select>
+        <label>Detail</label>
+      </div>
+      <div class="navigation-buttons">
+        <button class="btn-large grey lighten-2 black-text prev-btn" data-previous="page2">Previous</button>
+        <button class="btn-large blue white-text next-btn" data-next="page4" disabled>Next</button>
+      </div>
+    </section>
+
+    <!-- PAGE 4: COMPLEX BRANCHING (BIOPSY, HISTOLOGY) -->
+    <section id="page4" class="page">
+      <h2>Procedural/Histology Details</h2>
+      <p class="instructions">If applicable, specify if a biopsy was performed or if histology is known. This step adapts based on your previous selections.</p>
+      <div id="dynamicOptions" class="selection-area"></div>
+      <div class="navigation-buttons">
+        <button class="btn-large grey lighten-2 black-text prev-btn" data-previous="page3">Previous</button>
+        <button class="btn-large blue white-text next-btn" data-next="page5" disabled>Next</button>
+      </div>
+    </section>
+
+    <!-- PAGE 5: TISSUE SAMPLE TYPES -->
+    <section id="page5" class="page">
+      <h2>Choose Tissue Samples</h2>
+      <p class="instructions">Select all relevant tissues sampled during the operation.</p>
+      <div id="tissueSelection" class="selection-area checkbox-group"></div>
+      <div class="navigation-buttons">
+        <button class="btn-large grey lighten-2 black-text prev-btn" data-previous="page4">Previous</button>
+        <button class="btn-large blue white-text next-btn" data-next="page6">Next</button>
+      </div>
+    </section>
+
+    <!-- PAGE 6: EXTRA DETAILS (E.G. CSF LEAK SCENARIO) -->
+    <section id="page6" class="page">
+      <h2>Additional Operational Details</h2>
+      <p class="instructions">For spinal degenerations or SIH, indicate conditions like CSF leak. Otherwise, choose "No Leak".</p>
+      <div class="selection-area input-field">
+        <select id="extraDetail">
+          <option value="" disabled selected>Choose option</option>
+          <option value="No Leak">No CSF Leak</option>
+          <option value="Leak">CSF Leak Present</option>
+        </select>
+        <label>Operation Condition</label>
+      </div>
+      <div class="navigation-buttons">
+        <button class="btn-large grey lighten-2 black-text prev-btn" data-previous="page5">Previous</button>
+        <button class="btn-large blue white-text next-btn" data-next="page7" disabled>Next</button>
+      </div>
+    </section>
+
+    <!-- PAGE 7: HISTOLOGICAL MARKERS -->
+    <section id="page7" class="page">
+      <h2>Histological Markers</h2>
+      <p class="instructions">Select known histological markers (if any). If unknown or none, leave blank.</p>
+      <div id="histoGroup" class="selection-area checkbox-group">
+        <label><input type="checkbox" value="IDH"><span>IDH Mutation</span></label>
+        <label><input type="checkbox" value="MGMT"><span>MGMT Promoter Methylation</span></label>
+        <label><input type="checkbox" value="1p19q"><span>1p/19q Co-Deletion</span></label>
+      </div>
+      <div class="navigation-buttons">
+        <button class="btn-large grey lighten-2 black-text prev-btn" data-previous="page6">Previous</button>
+        <button class="btn-large blue white-text next-btn" data-next="page8">Next</button>
+      </div>
+    </section>
+
+    <!-- PAGE 8: ADDITIONAL COMPLEXITY HANDLING -->
+    <section id="page8" class="page">
+      <h2>Finalize Complex Branches</h2>
+      <p class="instructions">If further branching (e.g., known histology for recurrent HGG/LGG) is needed, handle it here. Otherwise, proceed.</p>
+      <div class="selection-area">
+        <p>No additional branching required based on your selections.</p>
+      </div>
+      <div class="navigation-buttons">
+        <button class="btn-large grey lighten-2 black-text prev-btn" data-previous="page7">Previous</button>
+        <button class="btn-large blue white-text next-btn" data-next="page9">Next</button>
+      </div>
+    </section>
+
+    <!-- PAGE 9: REVIEW CHOICES -->
+    <section id="page9" class="page">
+      <h2>Review Your Choices</h2>
+      <p class="instructions">Review all the information before submitting. You can go back to adjust if needed.</p>
+      <div class="selection-area">
+        <table class="striped">
+          <tbody id="reviewTable"></tbody>
+        </table>
+      </div>
+      <div class="navigation-buttons">
+        <button class="btn-large grey lighten-2 black-text prev-btn" data-previous="page8">Previous</button>
+        <button class="btn-large green white-text next-btn" data-next="page10">Continue</button>
+      </div>
+    </section>
+
+    <!-- PAGE 10: SUBMIT -->
+    <section id="page10" class="page">
+      <h2>Submit Your Data</h2>
+      <p class="instructions">If everything looks good, click "Submit." Otherwise, go back to make changes, or "Start Over".</p>
+      <div class="navigation-buttons">
+        <button class="btn-large grey lighten-2 black-text prev-btn" data-previous="page9">Previous</button>
+        <button class="btn-large green white-text submit-btn">Submit</button>
+      </div>
+      <div class="center-align" style="margin-top:1rem;">
+        <button class="btn-flat" id="startOverBtn">Start Over</button>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    &copy; [Kevin Joseph]. All rights reserved.
+  </footer>
+
+  <!-- Materialize JS -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Initialize Materialize components
+      M.FormSelect.init(document.querySelectorAll('select'));
+
+      // Data Structure Reflecting Your Updated Chart (Simplified/Representative)
+      const dataStructure = {
+        "Brain": {
+          options: ["Shunt", "Tumor", "Trauma", "Vascular", "Glioma"],
+          details: {
+            "Shunt": {options: ["Cortex Biopsy", "CSF", "Blood/Serum"], finalTissue: ["Cortex Biopsy", "CSF", "Blood/Serum"]},
+            "Tumor": {options: ["Metastasis", "Pediatric", "Other"], finalTissue: ["Tumor", "CSF", "Blood"]},
+            "Trauma": {options: ["Contusion Brain Tissue", "Resected Vessel Pathology"], finalTissue: ["CSF", "ICB"]},
+            "Vascular": {options: ["Resected Vessel Pathology"], finalTissue: ["CSF", "ICB"]},
+            "Glioma": {
+              options: ["HGG", "LGG", "other"],
+              details: {
+                "HGG": {
+                  options: ["Primary", "Recurrent"],
+                  Primary: {
+                    biopsy: ["Yes", "No"],
+                    tissueSampling: ["Tumor", "Access Tissue", "CSF", "Blood"]
+                  },
+                  Recurrent: {
+                    histo: ["Known Histo", "Unknown Histo"],
+                    tissueSampling: ["Tumor", "Access Tissue", "CSF", "Blood"]
+                  }
+                },
+                "LGG": {
+                  options: ["Primary", "Recurrent"],
+                  Primary: {
+                    biopsy: ["Yes", "No"],
+                    tissueSampling: ["Tumor", "Access Tissue", "CSF", "Blood"]
+                  },
+                  Recurrent: {
+                    histo: ["Known Histo", "Unknown Histo"],
+                    tissueSampling: ["Tumor", "Access Tissue", "CSF", "Blood"]
+                  }
+                },
+                "other": {
+                  tissueSampling: ["Tumor", "Access Tissue", "CSF", "Blood"]
+                }
+              }
+            }
+          }
+        },
+        "PIZ": {
+          options: ["Type of Surgery"],
+          details: {
+            "Type of Surgery": {
+              tissueSampling: ["Tumor", "Access Tissue", "CSF", "Blood"]
+            }
+          }
+        },
+        "Spine": {
+          options: ["Tumor", "Degeneration", "SIH"],
+          details: {
+            "Tumor": {
+              options: ["Extradural", "Intradural", "Intramedullary"],
+              tissueSampling: ["Bone", "LF", "Epidural Fat", "Blood"]
+            },
+            "Degeneration": {
+              options: ["Lumbar", "Thoracic", "Cervical"],
+              tissueSampling: ["Bone", "LF", "Epidural Fat", "IVD", "Blood", "CSF in case of leak"]
+            },
+            "SIH": {
+              tissueSampling: ["Neo Dura", "Bone Spikes", "Bone", "LF", "Subcutaneous Fat", "IVD", "Blood"]
+            }
+          }
+        }
+      };
+
+      let currentStep = 1;
+      const totalSteps = 10;
+      const selections = {
+        mainCategory: "",
+        subCategory: "",
+        detail: "",
+        biopsyDecision: "",
+        histoStatus: "",
+        tissues: [],
+        extraDetail: "",
+        histoMarkers: []
+      };
+
+      const sections = document.querySelectorAll('.page');
+      const nextButtons = document.querySelectorAll('.next-btn');
+      const prevButtons = document.querySelectorAll('.prev-btn');
+      const currentStepDisplay = document.getElementById('current-step');
+      const progressBar = document.getElementById('progress-bar');
+
+      const mainCategorySelect = document.getElementById('mainCategory');
+      const subCategorySelect = document.getElementById('subCategory');
+      const detailSelection = document.getElementById('detailSelection');
+      const dynamicOptions = document.getElementById('dynamicOptions');
+      const tissueSelection = document.getElementById('tissueSelection');
+      const extraDetailSelect = document.getElementById('extraDetail');
+      const reviewTable = document.getElementById('reviewTable');
+      const startOverBtn = document.getElementById('startOverBtn');
+
+      function goToStep(stepId) {
+        sections.forEach(sec => sec.classList.remove('active'));
+        document.getElementById(stepId).classList.add('active');
+        const stepNumber = parseInt(stepId.replace('page', ''), 10);
+        currentStep = stepNumber;
+        currentStepDisplay.textContent = stepNumber;
+        progressBar.style.width = (stepNumber / totalSteps * 100) + '%';
+        window.scrollTo({top: 0, behavior: 'smooth'});
+        updateNextButtons();
+      }
+
+      function updateNextButtons() {
+        document.querySelector('#page1 .next-btn').disabled = !selections.mainCategory;
+        document.querySelector('#page2 .next-btn').disabled = !selections.subCategory;
+        document.querySelector('#page3 .next-btn').disabled = !selections.detail;
+
+        const page4Next = document.querySelector('#page4 .next-btn');
+        // Page4 depends if we have a complex branch requiring biopsy/histo choice:
+        // If Glioma->HGG/LGG->Primary or Recurrent chosen, must choose biopsy/histo:
+        // Else it's straightforward.
+        if (dynamicOptions.querySelector('input[type="radio"]')) {
+          // If radio present, need a selection
+          page4Next.disabled = !selections.biopsyDecision && !selections.histoStatus;
+        } else {
+          // no radios, no condition
+          page4Next.disabled = false;
+        }
+
+        // Page5 no special requirement
+        // Page6: Need extraDetail
+        document.querySelector('#page6 .next-btn').disabled = !selections.extraDetail;
+      }
+
+      mainCategorySelect.addEventListener('change', (e) => {
+        selections.mainCategory = e.target.value;
+        subCategorySelect.innerHTML = '<option value="" disabled selected>Choose your option</option>';
+        if (dataStructure[selections.mainCategory]) {
+          dataStructure[selections.mainCategory].options.forEach(opt => {
+            const o = document.createElement('option');
+            o.value = opt;
+            o.textContent = opt;
+            subCategorySelect.appendChild(o);
+          });
+        }
+        M.FormSelect.init(subCategorySelect);
+        updateNextButtons();
+      });
+
+      subCategorySelect.addEventListener('change', (e) => {
+        selections.subCategory = e.target.value;
+        detailSelection.innerHTML = '<option value="" disabled selected>Choose your option</option>';
+        const mainCatObj = dataStructure[selections.mainCategory];
+        if (mainCatObj && mainCatObj.details[selections.subCategory]) {
+          const detailObj = mainCatObj.details[selections.subCategory];
+          if (detailObj.options) {
+            detailObj.options.forEach(d => {
+              const o = document.createElement('option');
+              o.value = d;
+              o.textContent = d;
+              detailSelection.appendChild(o);
+            });
+          } else {
+            // If no further options, just provide "N/A"
+            const o = document.createElement('option');
+            o.value = "N/A";
+            o.textContent = "N/A";
+            detailSelection.appendChild(o);
+          }
+        }
+        M.FormSelect.init(detailSelection);
+        updateNextButtons();
+      });
+
+      detailSelection.addEventListener('change', (e) => {
+        selections.detail = e.target.value;
+        updateNextButtons();
+      });
+
+      // Handle complex branching at page4
+      document.querySelector('#page3 .next-btn').addEventListener('click', () => {
+        dynamicOptions.innerHTML = '';
+        selections.biopsyDecision = "";
+        selections.histoStatus = "";
+
+        // If Brain->Glioma->HGG/LGG->Primary or Recurrent, show relevant radio sets
+        if (selections.mainCategory === "Brain" && selections.subCategory === "Glioma") {
+          const gliomaDetail = selections.detail; // HGG, LGG, other
+          const gliomaObj = dataStructure.Brain.details.Glioma.details[gliomaDetail];
+          if (gliomaDetail === "HGG" || gliomaDetail === "LGG") {
+            dynamicOptions.innerHTML = `<p>Is this ${gliomaDetail} case Primary or Recurrent?</p>
+            <div class="radio-group">
+              <label><input name="gliomaStage" type="radio" value="Primary"><span>Primary</span></label>
+              <label><input name="gliomaStage" type="radio" value="Recurrent"><span>Recurrent</span></label>
+            </div>`;
+            dynamicOptions.addEventListener('change', (ev) => {
+              if (ev.target.name === 'gliomaStage') {
+                selections.biopsyDecision = ev.target.value; // primary or recurrent
+                updateNextButtons();
+              }
+            });
+          } else {
+            // 'other' under Glioma: no extra stage, go straight
+            dynamicOptions.innerHTML = `<p>No additional classification needed for "other" Glioma. Proceed.</p>`;
+          }
+        } else if (selections.mainCategory === "Brain" && selections.subCategory !== "Glioma") {
+          dynamicOptions.innerHTML = `<p>No additional branching required. Proceed to tissue selection next.</p>`;
+        } else if (selections.mainCategory === "PIZ") {
+          dynamicOptions.innerHTML = `<p>PIZ selected. No further branching. Proceed to tissue selection.</p>`;
+        } else if (selections.mainCategory === "Spine") {
+          dynamicOptions.innerHTML = `<p>Spine selected. Tissue selection will be based on your chosen sub-category and detail.</p>`;
+        } else {
+          dynamicOptions.innerHTML = `<p>No additional branching required here. Proceed.</p>`;
+        }
+
+        updateNextButtons();
+      });
+
+      // Page5 Tissue Selection
+      document.querySelector('#page4 .next-btn').addEventListener('click', () => {
+        tissueSelection.innerHTML = '';
+        selections.tissues = [];
+
+        let finalTissues = [];
+        if (selections.mainCategory === "Brain") {
+          // If Glioma chosen:
+          if (selections.subCategory === "Glioma") {
+            const gliomaDetail = selections.detail;
+            if (gliomaDetail === "HGG" || gliomaDetail === "LGG") {
+              const stage = selections.biopsyDecision; // Primary or Recurrent
+              const gliomaObj = dataStructure.Brain.details.Glioma.details[gliomaDetail][stage ? stage : "other"];
+              finalTissues = gliomaObj ? gliomaObj.tissueSampling : ["Tumor", "Access Tissue", "CSF", "Blood"];
+            } else {
+              // Glioma other
+              finalTissues = dataStructure.Brain.details.Glioma.details["other"].tissueSampling;
+            }
+          } else {
+            // Non-glioma brain sub-category
+            const detailObj = dataStructure.Brain.details[selections.subCategory];
+            finalTissues = detailObj.finalTissue || ["Tumor", "CSF", "Blood"];
+          }
+        } else if (selections.mainCategory === "PIZ") {
+          const detailObj = dataStructure.PIZ.details[selections.subCategory];
+          finalTissues = detailObj.tissueSampling;
+        } else if (selections.mainCategory === "Spine") {
+          const detailObj = dataStructure.Spine.details[selections.subCategory];
+          if (detailObj.options && detailObj.options.includes(selections.detail)) {
+            // For Spine Tumor or Degeneration
+            if (selections.subCategory === "Tumor") {
+              finalTissues = detailObj.tissueSampling;
+            } else if (selections.subCategory === "Degeneration") {
+              // Tissue depends on operation (including CSF in case of leak)
+              finalTissues = detailObj.tissueSampling;
+            }
+          } else {
+            // For SIH
+            finalTissues = detailObj.tissueSampling;
+          }
+        }
+
+        finalTissues.forEach(t => {
+          const lbl = document.createElement('label');
+          lbl.innerHTML = `<input type="checkbox" value="${t}"><span>${t}</span>`;
+          tissueSelection.appendChild(lbl);
+        });
+
+        tissueSelection.addEventListener('change', () => {
+          const cbs = tissueSelection.querySelectorAll('input[type="checkbox"]');
+          selections.tissues = Array.from(cbs).filter(cb => cb.checked).map(cb => cb.value);
+        });
+      });
+
+      // Page6 Extra Detail (e.g. CSF leak)
+      extraDetailSelect.addEventListener('change', (e) => {
+        selections.extraDetail = e.target.value;
+        updateNextButtons();
+      });
+
+      // Histology Markers
+      document.getElementById('histoGroup').addEventListener('change', () => {
+        const histoCbs = document.querySelectorAll('#histoGroup input[type="checkbox"]');
+        selections.histoMarkers = Array.from(histoCbs).filter(cb => cb.checked).map(cb => cb.value);
+      });
+
+      // Review Page
+      document.querySelector('#page9 .next-btn').addEventListener('click', () => {
+        reviewTable.innerHTML = `
+          <tr><th>Main Category</th><td>${selections.mainCategory}</td></tr>
+          <tr><th>Sub-Category</th><td>${selections.subCategory}</td></tr>
+          <tr><th>Detail</th><td>${selections.detail}</td></tr>
+          <tr><th>Biopsy/Stage Decision</th><td>${selections.biopsyDecision || 'N/A'}</td></tr>
+          <tr><th>Histology Status</th><td>${selections.histoStatus || 'N/A'}</td></tr>
+          <tr><th>Tissues</th><td>${selections.tissues.join(', ') || 'None selected'}</td></tr>
+          <tr><th>Extra Detail</th><td>${selections.extraDetail || 'N/A'}</td></tr>
+          <tr><th>Histo Markers</th><td>${selections.histoMarkers.join(', ') || 'None'}</td></tr>
+        `;
+      });
+
+      nextButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+          const nextId = btn.getAttribute('data-next');
+          if (nextId) goToStep(nextId);
+        });
+      });
+
+      prevButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+          const prevId = btn.getAttribute('data-previous');
+          if (prevId) goToStep(prevId);
+        });
+      });
+
+      document.querySelector('.submit-btn').addEventListener('click', () => {
+        M.toast({html: 'Data submitted successfully!', classes: 'rounded'});
+      });
+
+      startOverBtn.addEventListener('click', () => {
+        location.reload();
+      });
+
+      goToStep('page1');
+    });
+  </script>
+</body>
+</html>
